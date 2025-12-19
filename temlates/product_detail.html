@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>{{ product.Name }} — FPV Shop</title>
+  <style>
+    :root { --bg:#041225; --card:rgba(255, 255, 255, 0.05); --accent:#06b6d4; --muted:#94a3b8; --white:#e6eef6; --gold:#f59e0b; }
+    body { margin:0; font-family: 'Inter', sans-serif; background: #02101a; color: var(--white); padding-top:40px; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+    
+    .product-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; background: var(--card); padding: 40px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(10px); }
+    .image-box img { width: 100%; border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); }
+    
+    .price { font-size: 38px; color: var(--accent); font-weight: 800; margin: 15px 0; text-shadow: 0 0 20px rgba(6,182,212,0.3); }
+    .option-title { font-size: 12px; text-transform: uppercase; color: var(--muted); margin: 25px 0 10px; display: block; letter-spacing: 1px; }
+    
+    .selection-group { display: flex; flex-wrap: wrap; gap: 12px; }
+    .chip { padding: 12px 24px; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; background: rgba(255,255,255,0.03); cursor: pointer; transition: 0.3s; font-weight: 500; }
+    .chip:hover { border-color: var(--accent); background: rgba(6,182,212,0.05); }
+    .chip.active { background: var(--accent); color: #02101a; font-weight: 700; border-color: var(--accent); box-shadow: 0 0 20px rgba(6,182,212,0.4); }
+
+    .buy-btn { display: block; width: 100%; padding: 20px; background: linear-gradient(90deg, var(--accent), #0891b2); color: #001e23; text-align: center; text-decoration: none; font-weight: 800; border-radius: 16px; margin-top: 40px; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; }
+    .buy-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(6,182,212,0.5); }
+    
+    .desc { line-height: 1.6; color: #cbd5e1; margin-top: 20px; font-size: 15px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="product-grid">
+      <div class="image-box"><img src="/static/{{ product.Image }}"></div>
+      <div class="info-box">
+        <a href="/" style="color:var(--muted); text-decoration:none; font-size:14px;">← Назад до каталогу</a>
+        <h1 style="margin-top:10px; font-size:32px;">{{ product.Name }}</h1>
+        <div class="price">{{ product.Price }} грн</div>
+        
+        <div class="desc">{{ product.Description }}</div>
+
+        <span class="option-title">Виберіть модель:</span>
+        <div class="selection-group" id="model-selector">
+            {% for m in product.Model.split(',') if product.Model %}
+                <div class="chip" onclick="selectOption(this)">{{ m.strip() }}</div>
+            {% else %}
+                <div class="chip active">Standard</div>
+            {% endfor %}
+        </div>
+
+        <span class="option-title">Виберіть колір:</span>
+        <div class="selection-group" id="color-selector">
+            {% for c in product.Colors.split(',') if product.Colors %}
+                <div class="chip" onclick="selectOption(this)">{{ c.strip() }}</div>
+            {% else %}
+                <div class="chip active">Original</div>
+            {% endfor %}
+        </div>
+
+        <a href="#" class="buy-btn" onclick="sendToCart(event)">🛒 Додати в кошик</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function selectOption(el) {
+        el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    function sendToCart(e) {
+        e.preventDefault();
+        const model = document.querySelector('#model-selector .chip.active')?.innerText || 'Standard';
+        const color = document.querySelector('#color-selector .chip.active')?.innerText || 'Default';
+        window.location.href = `/add_to_cart/{{ product.id }}?model=${encodeURIComponent(model)}&color=${encodeURIComponent(color)}`;
+    }
+
+    // Ініціалізація активних кнопок
+    document.querySelectorAll('.selection-group').forEach(group => {
+        if (!group.querySelector('.active')) {
+            group.querySelector('.chip')?.classList.add('active');
+        }
+    });
+  </script>
+</body>
+</html>
