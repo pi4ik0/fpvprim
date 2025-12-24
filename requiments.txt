@@ -1,1 +1,5 @@
-# fpvprim
+Flask
+Flask-Mail
+SQLAlchemy
+Werkzeug
+matplotlib
