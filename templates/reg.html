@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Реєстрація — підтвердження поштою</title>
+  <style>
+    :root{--bg:#041225;--card:#071a2a;--accent:#06b6d4;--muted:#94a3b8}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Roboto,Arial;background:linear-gradient(180deg,#02101a,#041225);color:#e6eef6;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    .card{width:100%;max-width:760px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:28px;box-shadow:0 10px 30px rgba(2,6,23,0.6)}
+    h1{margin:0 0 6px;font-size:22px}
+    p.lead{margin:0 0 18px;color:var(--muted)}
+    label{display:block;font-size:13px;margin-bottom:8px;color:#d6e8f3}
+    input, button{width:100%;padding:12px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);color:inherit;font-size:14px}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .actions{display:flex;gap:12px;margin-top:12px}
+    .btn{background:linear-gradient(90deg,var(--accent),#0891b2);border:none;color:#001e23;font-weight:700;padding:10px 14px;border-radius:10px;cursor:pointer}
+    .btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+    .small{font-size:13px;color:var(--muted);margin-top:8px}
+    .flash{padding:8px 12px;border-radius:8px;margin-bottom:12px}
+    .flash.success{background:rgba(6,182,212,0.12);color:#a7f0fb}
+    .flash.error{background:rgba(255,69,58,0.08);color:#ffb4aa}
+    .code-row{display:flex;gap:8px}
+    .code-row input{flex:1}
+    form{margin-top:12px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Реєстрація</h1>
+    <p class="lead">Введіть свої дані. Натисніть «Надіслати код», щоб отримати код підтвердження на пошту.</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+          <div class="flash {{ category }}">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="post" action="/send_code" id='formemailcode'>
+      <label for="Email_send">Email (отримати код)</label>
+      <input id="Email_send" name="Email" placeholder="you@example.com" />
+      <div style="margin-top:8px"><button class="btn" type="submit">Надіслати код</button></div>
+    </form>
+
+    <form method="post" action="/reg">
+      <div class="two" style="margin-top:12px">
+        <div>
+          <label for="Name">Нік</label>
+          <input id="Name" name="Name" />
+        </div>
+        <div>
+          <label for="Phone">Телефон</label>
+          <input id="Phone" name="Phone" />
+        </div>
+      </div>
+
+      <label style="margin-top:12px" for="Email">Email</label>
+      <input id="Email" name="Email" />
+
+      <label style="margin-top:12px" for="Password">Пароль</label>
+      <input id="Password" name="Password" type="password" />
+
+      <label style="margin-top:12px">Код підтвердження</label>
+      <div class="code-row">
+        <input name="Code" placeholder="123456" />
+        <button type="submit" class="btn">Зареєструватися</button>
+      </div>
+
+      <p class="small">Після натискання "Надіслати код" на вашу пошту прийде 6-значний код. Використайте його тут для завершення реєстрації.</p>
+    </form>
+
+    {% if session.user %}
+      <p class="small" style="margin-top:12px">Ви увійшли як: {{ session.user.name }} ({{ session.user.email }})</p>
+    {% endif %}
+  </div>
+</body>
+<script>
+  const form = document.getElementById('formemailcode');
+
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    const email = document.getElementById('Email_send').value;
+
+    fetch(`/sendcode?Email=${email}`)
+  });
+</script>
+</html>

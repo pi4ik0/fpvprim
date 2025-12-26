@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="uk">
+<head>
+    <meta charset="utf-8"/>
+    <title>Кошик — FPV Shop</title>
+    <style>
+        :root { --bg:#041225; --card:#071a2a; --accent:#06b6d4; }
+        body { background: #02101a; color: #e6eef6; font-family: Inter, sans-serif; padding: 30px; }
+        .container { max-width: 700px; margin: auto; background: rgba(255,255,255,0.03); padding: 25px; border-radius: 15px; }
+        .item { display: flex; align-items: center; gap: 15px; background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); }
+        .item img { width: 70px; height: 50px; object-fit: cover; border-radius: 6px; }
+        .meta { flex: 1; }
+        .variant { font-size: 13px; color: var(--accent); margin-top: 4px; }
+        .btns { display: flex; gap: 8px; margin-top: 10px; }
+        .btn-s { padding: 4px 10px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; }
+        .plus { background: var(--accent); color: #000; }
+        .minus { border: 1px solid #94a3b8; color: #94a3b8; }
+        .del { color: #ff4444; margin-left: auto; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Кошик</h1>
+        {% if not products %}
+            <p>Кошик порожній. <a href="/catalog" style="color:var(--accent)">До каталогу</a></p>
+        {% else %}
+            {% for p in products %}
+            <div class="item">
+                <img src="/static/{{ p.image }}">
+                <div class="meta">
+                    <b>{{ p.name }}</b>
+                    <div class="variant">⚙️ {{ p.model }} | 🎨 {{ p.color }}</div>
+                    <div class="btns">
+                        <span>{{ p.qty }} шт.</span>
+                        <a href="/add_to_cart/{{ p.id }}?model={{ p.model }}&color={{ p.color }}" class="btn-s plus">+</a>
+                        <a href="/remove_one/{{ p.item_key }}" class="btn-s minus">−</a>
+                    </div>
+                </div>
+                <div style="font-weight:bold;">{{ p.subtotal }} грн</div>
+                <a href="/remove_from_cart/{{ p.item_key }}" class="del">×</a>
+            </div>
+            {% endfor %}
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">
+                <h2 style="margin:0;">Разом: {{ total }} грн</h2>
+                <a href="/checkout" style="background:var(--accent); color:#000; padding:12px 20px; text-decoration:none; border-radius:10px; font-weight:bold;">Оформити →</a>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

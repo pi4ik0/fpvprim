@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Додавання товару — Адмін панель</title>
+    <style>
+        :root {
+            --bg: #02101a;
+            --card: #041225;
+            --accent: #06b6d4;
+            --muted: #94a3b8;
+            --input-bg: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', system-ui, sans-serif;
+            background: radial-gradient(circle at top, #062d44 0%, var(--bg) 100%);
+            color: #e6eef6;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .admin-container {
+            width: 100%;
+            max-width: 700px;
+            background: var(--card);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+            background: linear-gradient(90deg, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 14px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s;
+            box-sizing: border-box;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(6, 182, 212, 0.05);
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: #0891b2;
+            margin-top: 5px;
+            display: block;
+        }
+
+        /* Стиль для завантаження файлу */
+        .file-upload {
+            position: relative;
+            padding: 20px;
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .file-upload:hover {
+            border-color: var(--accent);
+            background: rgba(255,255,255,0.02);
+        }
+
+        input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0; left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        #preview {
+            max-width: 150px;
+            margin-top: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            margin-top: 30px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(90deg, var(--accent), #0891b2);
+            color: #001e23;
+            font-size: 18px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(6, 182, 212, 0.3);
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back-link:hover { color: #fff; }
+
+        @media (max-width: 600px) {
+            .row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="admin-container">
+    <h1>Додати новий товар</h1>
+
+    <form action="/add_goods" method="POST" enctype="multipart/form-data">
+        
+        <div class="form-group">
+            <label>Назва товару</label>
+            <input type="text" name="Name" placeholder="Наприклад: Mark4 7-inch FPV Drone" required>
+        </div>
+
+        <div class="row">
+            <div class="form-group">
+                <label>Ціна (грн)</label>
+                <input type="number" name="Price" placeholder="15000" required>
+            </div>
+            <div class="form-group">
+                <label>Моделі / Версії</label>
+                <input type="text" name="Model" placeholder="Analog, ELRS, TBS">
+                <span class="hint">Через кому: V1, V2, Pro</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Доступні кольори</label>
+            <input type="text" name="Colors" placeholder="Чорний, Синій, Карбон">
+            <span class="hint">Через кому: Black, Red, Blue</span>
+        </div>
+
+        <div class="form-group">
+            <label>Детальний опис</label>
+            <textarea name="Description" placeholder="Опишіть характеристики, мотори, камеру..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Зображення товару</label>
+            <div class="file-upload">
+                <span id="file-label">Натисніть або перетягніть фото</span>
+                <input type="file" name="Image" accept="image/*" required onchange="previewImage(this)">
+                <center><img id="preview" src="#" alt="Прев'ю"></center>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-submit">🚀 Опублікувати товар</button>
+    </form>
+
+    <a href="/catalog" class="back-link">← Повернутися до каталогу</a>
+</div>
+
+<script>
+    function previewImage(input) {
+        const preview = document.getElementById('preview');
+        const label = document.getElementById('file-label');
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                label.innerText = "Зображення вибрано: " + input.files[0].name;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+
+</body>
+</html>
